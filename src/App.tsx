@@ -1,33 +1,37 @@
-import DreamSpot from "@/assets/DreamSpot.mp3";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   audioContext,
   analyser,
-  frequencyDataArray,
-  oscilloscopeDataArray,
+  dataArray,
   bufferLength,
 } from "./audio/audioContext";
+import WaveGraph from "./components/WaveGraph";
+import ControlGroup from "./components/ControlGroup";
 import FrequencyGraph from "./components/FrequencyGraph";
 import OscilloscopeGraph from "./components/OscilloscopeGraph";
 
-let isPlaying = false;
-
 export default function App() {
+  const [isPlay, setIsPlay] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const track = useRef<MediaElementAudioSourceNode>();
+  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
 
-  const handlePlayClick = () => {
-    if (audioContext.state === "suspended") {
-      audioContext.resume();
-    }
+  const decodeAudio = async () => {
+    if (!audioRef.current) return;
 
-    if (isPlaying) {
-      audioRef.current?.pause();
-      isPlaying = false;
-    } else {
-      audioRef.current?.play();
-      isPlaying = true;
-    }
+    const audioElement = audioRef.current;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", audioElement.src, true);
+    xhr.responseType = "arraybuffer";
+    xhr.onload = function () {
+      audioContext.decodeAudioData(
+        xhr.response,
+        (buffer) => setAudioBuffer(buffer),
+        (error) => console.log("xhr error", error)
+      );
+    };
+    xhr.send();
   };
 
   useLayoutEffect(() => {
@@ -41,29 +45,27 @@ export default function App() {
       <div>
         <h2>something new</h2>
       </div>
+      <ControlGroup
+        audioContext={audioContext}
+        audioRef={audioRef}
+        isPlay={isPlay}
+        setIsPlay={setIsPlay}
+        handleUploadedFinished={decodeAudio}
+      />
       <div>
+        <WaveGraph audioBuffer={audioBuffer} audioContext={audioContext} />
         <FrequencyGraph
           analyser={analyser}
-          dataArray={frequencyDataArray}
+          dataArray={dataArray}
           bufferLength={bufferLength}
         />
         <OscilloscopeGraph
           analyser={analyser}
-          dataArray={oscilloscopeDataArray}
+          dataArray={dataArray}
           bufferLength={bufferLength}
         />
       </div>
-      <audio
-        onEnded={() => {
-          isPlaying = false;
-        }}
-        ref={audioRef}
-        src={DreamSpot}
-      ></audio>
-
-      <div>
-        <button onClick={handlePlayClick}>play/pause</button>
-      </div>
+      <audio onEnded={() => setIsPlay(false)} ref={audioRef}></audio>
     </div>
   );
 }

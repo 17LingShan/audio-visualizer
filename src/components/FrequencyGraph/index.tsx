@@ -10,7 +10,7 @@ interface FrequencyGraphProp {
 export default function FrequencyGraph(props: FrequencyGraphProp) {
   const { analyser, dataArray, bufferLength } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContext = useRef<CanvasRenderingContext2D>();
 
   function drawFrequency() {
@@ -62,15 +62,15 @@ export default function FrequencyGraph(props: FrequencyGraphProp) {
   }
 
   useEffect(() => {
-    if (!canvas.current || !wrapRef.current) return;
-    canvasContext.current = canvas.current.getContext("2d")!;
-    canvas.current.width = wrapRef.current.clientWidth;
+    if (!canvasRef.current || !wrapRef.current) return;
+    canvasRef.current.width = wrapRef.current.clientWidth;
+    canvasContext.current = canvasRef.current.getContext("2d")!;
     drawFrequency();
   }, []);
 
   return (
     <div ref={wrapRef}>
-      <canvas height={graphHeight} ref={canvas}></canvas>
+      <canvas height={graphHeight} ref={canvasRef}></canvas>
     </div>
   );
 }

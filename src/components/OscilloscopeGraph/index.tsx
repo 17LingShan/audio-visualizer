@@ -10,7 +10,7 @@ interface OscilloscopeGraphProp {
 export default function OscilloscopeGraph(props: OscilloscopeGraphProp) {
   const { analyser, dataArray, bufferLength } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContext = useRef<CanvasRenderingContext2D>();
 
   function drawOscilloscope() {
@@ -53,15 +53,15 @@ export default function OscilloscopeGraph(props: OscilloscopeGraphProp) {
   }
 
   useEffect(() => {
-    if (!canvas.current || !wrapRef.current) return;
-    canvasContext.current = canvas.current.getContext("2d")!;
-    canvas.current.width = wrapRef.current.clientWidth;
+    if (!canvasRef.current || !wrapRef.current) return;
+    canvasContext.current = canvasRef.current.getContext("2d")!;
+    canvasRef.current.width = wrapRef.current.clientWidth;
     drawOscilloscope();
   }, []);
 
   return (
     <div ref={wrapRef}>
-      <canvas height={graphHeight} ref={canvas}></canvas>
+      <canvas height={graphHeight} ref={canvasRef}></canvas>
     </div>
   );
 }
