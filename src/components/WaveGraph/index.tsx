@@ -40,7 +40,6 @@ export default function WaveGraph(props: WaveGraphProp) {
 
     let x = 0,
       y = graphHeight >>> 1;
-    let offset = 0.5;
 
     canvasCtx.fillStyle = "#fa541c";
     canvasCtx.beginPath();
