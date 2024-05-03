@@ -1,8 +1,29 @@
+import audio from "../assets/DreamSpot.mp3";
+
+document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
+  <div>
+    <h2>something new</h2>
+  </div>
+  <div id="frequency-wrap">
+      <canvas id="frequency" height="300px"></canvas>
+    </div>
+
+    <div id="oscilloscope-wrap">
+      <canvas id="oscilloscope" height="300px"></canvas>
+    </div>
+
+    <audio id="audio"></audio>
+
+    <div>
+      <button id="play">play/pause</button>
+    </div>
+`;
+
 // create context, analyser and element of audio
 const audioCtx = new window.AudioContext();
 const analyser = audioCtx.createAnalyser();
-const audioEle = document.querySelector("#audio");
-
+const audioEle = document.querySelector<HTMLMediaElement>("#audio")!;
+audioEle.src = audio;
 let isPlaying = false;
 
 const track = audioCtx.createMediaElementSource(audioEle);
@@ -19,9 +40,10 @@ const frequencyDataArray = new Uint8Array(bufferLength);
 const oscilloscopeDataArray = new Uint8Array(bufferLength);
 
 // 能量条初始化
-const frequencyWrap = document.querySelector("#frequency-wrap");
-const frequency = document.querySelector("#frequency");
-const frequencyCtx = frequency.getContext("2d");
+const frequencyWrap =
+  document.querySelector<HTMLDivElement>("#frequency-wrap")!;
+const frequency = document.querySelector<HTMLCanvasElement>("#frequency")!;
+const frequencyCtx = frequency.getContext("2d")!;
 frequency.width = frequencyWrap.clientWidth; // canvas宽度和父元素宽度一致
 
 // 绘制能量条
@@ -73,9 +95,11 @@ function drawFrequency() {
 drawFrequency();
 
 // 示波器初始化
-const oscilloscopeWrap = document.querySelector("#oscilloscope-wrap");
-const oscilloscope = document.querySelector("#oscilloscope");
-const oscilloscopeCtx = oscilloscope.getContext("2d");
+const oscilloscopeWrap =
+  document.querySelector<HTMLDivElement>("#oscilloscope-wrap")!;
+const oscilloscope =
+  document.querySelector<HTMLCanvasElement>("#oscilloscope")!;
+const oscilloscopeCtx = oscilloscope.getContext("2d")!;
 oscilloscope.width = oscilloscopeWrap.clientWidth;
 
 // 绘制示波器
@@ -139,4 +163,4 @@ function handlePlayEnded() {
 }
 
 audioEle.addEventListener("ended", handlePlayEnded);
-playBtn.addEventListener("click", handleClickPlay);
+playBtn?.addEventListener("click", handleClickPlay);
