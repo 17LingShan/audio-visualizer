@@ -1,5 +1,5 @@
-import { graphHeight } from "@/configs/graph";
 import { useEffect, useRef } from "react";
+import { graphHeight } from "@/configs/graph";
 
 interface OscilloscopeGraphProp {
   analyser: AnalyserNode;
@@ -7,7 +7,7 @@ interface OscilloscopeGraphProp {
   bufferLength: number;
 }
 
-export default function OscilloscopeGraph(props: OscilloscopeGraphProp) {
+function OscilloscopeGraph(props: OscilloscopeGraphProp) {
   const { analyser, dataArray, bufferLength } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -65,3 +65,5 @@ export default function OscilloscopeGraph(props: OscilloscopeGraphProp) {
     </div>
   );
 }
+
+export default OscilloscopeGraph;

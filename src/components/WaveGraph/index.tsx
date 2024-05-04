@@ -6,7 +6,7 @@ interface WaveGraphProp {
   audioBuffer: AudioBuffer | null;
 }
 
-export default function WaveGraph(props: WaveGraphProp) {
+function WaveGraph(props: WaveGraphProp) {
   const { audioBuffer } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,7 +15,6 @@ export default function WaveGraph(props: WaveGraphProp) {
   // https://juejin.cn/post/6970558571700453390
   const drawWave = () => {
     if (!audioBuffer) return;
-    console.log("audioBuffer", audioBuffer);
 
     const wrap = wrapRef.current!;
     const canvasCtx = canvasContext.current!;
@@ -26,22 +25,24 @@ export default function WaveGraph(props: WaveGraphProp) {
     // 1为单声道 2为双声道
     const originData = audioBuffer.getChannelData(0);
     const originStep = Math.floor(originData.length / wrap.clientWidth);
+    const positives: number[] = [],
+      negatives: number[] = [];
 
-    const positives = [],
-      negatives = [];
-
-    for (let i = 0; i < originStep; i++) {
-      const temp = Array.from(
-        originData.slice(i * originStep, (i + 1) * originStep)
-      );
-      positives.push(Math.max.apply(null, temp));
-      negatives.push(Math.min.apply(null, temp));
+    for (let i = 0; i < originData.length; i += originStep) {
+      let maxNum = -Infinity,
+        minNum = Infinity;
+      for (let j = 0; j < originStep; j++) {
+        maxNum = Math.max(maxNum, originData[j + i]);
+        minNum = Math.min(minNum, originData[j + i]);
+      }
+      positives.push(maxNum);
+      negatives.push(minNum);
     }
 
     let x = 0,
       y = graphHeight >>> 1;
 
-    canvasCtx.fillStyle = "#fa541c";
+    canvasCtx.fillStyle = "#cc34eb";
     canvasCtx.beginPath();
     canvasCtx.moveTo(x, y);
 
@@ -73,3 +74,5 @@ export default function WaveGraph(props: WaveGraphProp) {
     </div>
   );
 }
+
+export default WaveGraph;

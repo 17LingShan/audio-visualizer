@@ -1,49 +1,37 @@
-import { ChangeEventHandler, Dispatch, RefObject } from "react";
 import styles from "./styles.module.scss";
 import commonStyles from "@/styles/common.module.scss";
+import { ChangeEventHandler } from "react";
+import { audioContext } from "@/audio/audioContext";
 
 interface ControlGroupProps {
   isPlay: boolean;
-  setIsPlay: Dispatch<React.SetStateAction<boolean>>;
   audioContext: AudioContext;
-  audioRef: RefObject<HTMLAudioElement>;
-  handleUploadedFinished?: () => void;
+  audioRef: HTMLAudioElement | null;
+  handleUploadedFinished?: (audioContext: AudioContext) => void;
+  onPlay: (audioContext: AudioContext) => void;
+  onPause: (audioContext: AudioContext) => void;
 }
 
-export default function ControlGroup(props: ControlGroupProps) {
-  const { isPlay, setIsPlay, audioContext, audioRef, handleUploadedFinished } =
-    props;
+function ControlGroup(props: ControlGroupProps) {
+  const { isPlay, onPause, onPlay, audioRef, handleUploadedFinished } = props;
 
   const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (event) => {
+    if (!audioRef) return;
+
     const file = event.target.files!;
-    audioRef.current!.src = URL.createObjectURL(file[0]);
-    audioRef.current?.load();
-    handleUploadedFinished?.();
-    handlePlay();
+    audioRef.src = URL.createObjectURL(file[0]);
+    audioRef.load();
+    handleUploadedFinished?.(audioContext);
+    onPlay(audioContext);
   };
 
   const handlePlayClick = () => {
-    if (!audioRef.current?.src) {
+    if (!audioRef?.src) {
       console.log("no audio resource inside!");
       return;
     }
 
-    isPlay ? handlePause() : handlePlay();
-  };
-
-  const handlePlay = () => {
-    if (audioContext.state === "suspended") {
-      audioContext.resume();
-    }
-    audioRef.current?.play();
-    setIsPlay(true);
-  };
-  const handlePause = () => {
-    if (audioContext.state === "suspended") {
-      audioContext.resume();
-    }
-    audioRef.current?.pause();
-    setIsPlay(false);
+    isPlay ? onPlay(audioContext) : onPause(audioContext);
   };
 
   return (
@@ -66,3 +54,5 @@ export default function ControlGroup(props: ControlGroupProps) {
     </div>
   );
 }
+
+export default ControlGroup;

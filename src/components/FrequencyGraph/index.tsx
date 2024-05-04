@@ -7,7 +7,7 @@ interface FrequencyGraphProp {
   bufferLength: number;
 }
 
-export default function FrequencyGraph(props: FrequencyGraphProp) {
+function FrequencyGraph(props: FrequencyGraphProp) {
   const { analyser, dataArray, bufferLength } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -74,3 +74,5 @@ export default function FrequencyGraph(props: FrequencyGraphProp) {
     </div>
   );
 }
+
+export default FrequencyGraph;
