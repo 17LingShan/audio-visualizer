@@ -6,35 +6,44 @@ export class SourceState {
   audioBuffer: AudioBuffer | null = null;
 
   constructor() {
+    this.play = this.play.bind(this);
+    this.pause = this.pause.bind(this);
+    this.decodeAudio = this.decodeAudio.bind(this);
+
     makeAutoObservable(this);
   }
 
-  setRef = (ref: HTMLAudioElement) => {
+  setRef(ref: HTMLAudioElement) {
     this.audioRef = ref;
-  };
+  }
 
-  setAudioBuffer = (buffer: AudioBuffer) => {
+  setAudioBuffer(buffer: AudioBuffer) {
     this.audioBuffer = buffer;
-  };
+  }
 
-  resume = (audioContext: AudioContext) => {
+  setIsPlaying(play: boolean) {
+    this.isPlaying = play;
+  }
+
+  resume(audioContext: AudioContext) {
     if (audioContext.state !== "suspended") return;
     audioContext.resume();
-  };
+  }
 
-  play = (audioContext: AudioContext) => {
+  play(audioContext: AudioContext) {
     this.resume(audioContext);
-    this.audioRef?.play().then(() => (this.isPlaying = true));
-  };
+    this.audioRef?.play().then(() => this.setIsPlaying(true));
+  }
 
-  pause = (audioContext: AudioContext) => {
+  pause(audioContext: AudioContext) {
     this.resume(audioContext);
     this.audioRef?.pause();
-    this.isPlaying = false;
-  };
+    this.setIsPlaying(false);
+  }
 
-  decodeAudio = (audioContext: AudioContext) => {
+  decodeAudio(audioContext: AudioContext) {
     if (!this.audioRef) return;
+
     const xhr = new XMLHttpRequest();
     xhr.open("GET", toJS(this.audioRef.src), true);
     xhr.responseType = "arraybuffer";
@@ -46,7 +55,7 @@ export class SourceState {
       );
     };
     xhr.send();
-  };
+  }
 }
 
 const SourceStateStore = new SourceState();

@@ -1,14 +1,15 @@
-import { graphHeight } from "@/configs/graph";
 import { useEffect, useRef } from "react";
+import type { GraphThemeProps } from "@/store/type";
 
 interface FrequencyGraphProp {
   analyser: AnalyserNode;
   dataArray: Uint8Array;
   bufferLength: number;
+  theme: GraphThemeProps;
 }
 
 function FrequencyGraph(props: FrequencyGraphProp) {
-  const { analyser, dataArray, bufferLength } = props;
+  const { analyser, dataArray, bufferLength, theme } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContext = useRef<CanvasRenderingContext2D>();
@@ -22,7 +23,7 @@ function FrequencyGraph(props: FrequencyGraphProp) {
     const canvasCtx = canvasContext.current!;
 
     // 每次绘制都会初始化画布
-    canvasCtx.fillStyle = "#c8c8c8";
+    canvasCtx.fillStyle = theme.graphBackground as string;
     canvasCtx.fillRect(0, 0, wrap.clientWidth, wrap.clientHeight);
 
     // 每个能量条可操作的宽度
@@ -70,7 +71,7 @@ function FrequencyGraph(props: FrequencyGraphProp) {
 
   return (
     <div ref={wrapRef}>
-      <canvas height={graphHeight} ref={canvasRef}></canvas>
+      <canvas height={theme.graphHeight} ref={canvasRef}></canvas>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import styles from "./App.module.scss";
 import { useLayoutEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import {
@@ -6,6 +7,7 @@ import {
   dataArray,
   bufferLength,
 } from "./audio/audioContext";
+import GraphThemeStore from "./store/graph";
 import SourceStateStore from "./store/audio";
 import WaveGraph from "./components/WaveGraph";
 import ControlGroup from "./components/ControlGroup";
@@ -25,6 +27,10 @@ function App() {
     SourceStateStore.setRef(audioRef.current);
     track.current = audioContext.createMediaElementSource(audioRef.current);
     track.current.connect(analyser).connect(audioContext.destination);
+
+    audioRef.current.addEventListener("canplay", () =>
+      SourceStateStore.play(audioContext)
+    );
   }, []);
 
   return (
@@ -40,20 +46,24 @@ function App() {
         onPause={SourceStateStore.pause}
         handleUploadedFinished={SourceStateStore.decodeAudio}
       />
-      <div>
+      <div className={styles["graph-group"]}>
         <WaveGraph
+          audioRef={SourceStateStore.audioRef}
           audioBuffer={SourceStateStore.audioBuffer}
           audioContext={audioContext}
+          theme={GraphThemeStore.getTheme}
         />
         <FrequencyGraph
           analyser={analyser}
           dataArray={dataArray}
           bufferLength={bufferLength}
+          theme={GraphThemeStore.getTheme}
         />
         <OscilloscopeGraph
           analyser={analyser}
           dataArray={dataArray}
           bufferLength={bufferLength}
+          theme={GraphThemeStore.getTheme}
         />
       </div>
       <audio onEnded={handleAudioEnded} ref={audioRef}></audio>

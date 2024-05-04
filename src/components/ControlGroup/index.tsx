@@ -22,7 +22,6 @@ function ControlGroup(props: ControlGroupProps) {
     audioRef.src = URL.createObjectURL(file[0]);
     audioRef.load();
     handleUploadedFinished?.(audioContext);
-    onPlay(audioContext);
   };
 
   const handlePlayClick = () => {
@@ -30,8 +29,7 @@ function ControlGroup(props: ControlGroupProps) {
       console.log("no audio resource inside!");
       return;
     }
-
-    isPlay ? onPlay(audioContext) : onPause(audioContext);
+    isPlay ? onPause(audioContext) : onPlay(audioContext);
   };
 
   return (
@@ -41,16 +39,19 @@ function ControlGroup(props: ControlGroupProps) {
       </button>
       <label htmlFor="file" className={commonStyles["old-button"]}>
         upload mp3 file
+        <input
+          id="file"
+          type="file"
+          style={{
+            display: "none",
+          }}
+          onChange={handleFileUpload}
+          accept=".mp3"
+        />
       </label>
-      <input
-        id="file"
-        type="file"
-        style={{
-          display: "none",
-        }}
-        onChange={handleFileUpload}
-        accept=".mp3"
-      />
+      <button className={commonStyles["old-button"]}>
+        {`${audioRef?.currentTime}/${audioRef?.duration}`}
+      </button>
     </div>
   );
 }
