@@ -1,16 +1,21 @@
 import styles from "./index.module.scss";
-import { useEffect, useRef } from "react";
+import { MouseEventHandler, useEffect, useRef } from "react";
+import useProgress from "@/hooks/useProgress";
 import { GraphThemeProps } from "@/store/type";
+import { getProgressXByDuration, getTimeByWidth } from "@/utils/common";
 
 interface WaveGraphProp {
   audioContext: AudioContext;
-  audioRef: HTMLAudioElement | null;
+  audioRef: HTMLAudioElement;
   audioBuffer: AudioBuffer | null;
   theme: GraphThemeProps;
 }
 
 function WaveGraph(props: WaveGraphProp) {
   const { audioBuffer, theme, audioRef } = props;
+  const { duration, currentTime, handleChangeCurrentTime } =
+    useProgress(audioRef);
+
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const waveRef = useRef<HTMLCanvasElement>(null);
@@ -31,6 +36,7 @@ function WaveGraph(props: WaveGraphProp) {
     // 1为单声道 2为双声道
     const originData = audioBuffer.getChannelData(0);
     const originStep = Math.floor(originData.length / wrap.clientWidth);
+    // 声波图采样展示数据: positives为上方, negatives为下方
     const positives: number[] = [],
       negatives: number[] = [];
 
@@ -38,8 +44,9 @@ function WaveGraph(props: WaveGraphProp) {
       let maxNum = -Infinity,
         minNum = Infinity;
       for (let j = 0; j < originStep; j++) {
-        maxNum = Math.max(maxNum, originData[j + i]);
-        minNum = Math.min(minNum, originData[j + i]);
+        const data = originData[j + i];
+        if (data > maxNum) maxNum = data;
+        if (data < minNum) minNum = data;
       }
       positives.push(maxNum);
       negatives.push(minNum);
@@ -62,15 +69,13 @@ function WaveGraph(props: WaveGraphProp) {
     waveCanvasCtx.fill();
   };
 
-  const drawProgressbar = (e: Event) => {
-    if (!audioRef || isNaN(audioRef.duration)) return;
-
+  const drawProgressbar = () => {
     const wrap = wrapRef.current!;
     const progressCtx = progressContext.current!;
-    const time = +audioRef.currentTime;
-    const barWidth = wrap.clientWidth / audioRef.duration;
-    const x = time * barWidth;
 
+    // 父元素内x的坐标
+    const x = getProgressXByDuration(currentTime, wrap.clientWidth, duration);
+    // 清除之前画的线条
     progressCtx.clearRect(0, 0, wrap.clientWidth, wrap.clientHeight);
 
     progressCtx.beginPath();
@@ -82,8 +87,13 @@ function WaveGraph(props: WaveGraphProp) {
     progressCtx.stroke();
   };
 
-  const handleAudioDurationChange = (e: Event) => {
-    requestAnimationFrame(() => drawProgressbar(e));
+  const handleProgressClick: MouseEventHandler = (e) => {
+    if (!wrapRef.current || !audioRef.src) return;
+    const wrap = wrapRef.current;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const time = getTimeByWidth(clickX, wrap.clientWidth, duration);
+    handleChangeCurrentTime(time);
   };
 
   useEffect(() => {
@@ -91,11 +101,8 @@ function WaveGraph(props: WaveGraphProp) {
   }, [audioBuffer]);
 
   useEffect(() => {
-    audioRef?.addEventListener("timeupdate", handleAudioDurationChange);
-    return () => {
-      audioRef?.removeEventListener("timeupdate", handleAudioDurationChange);
-    };
-  }, [audioRef]);
+    requestAnimationFrame(drawProgressbar);
+  }, [currentTime]);
 
   useEffect(() => {
     if (!wrapRef.current || !waveRef.current || !progressRef.current) return;
@@ -120,6 +127,7 @@ function WaveGraph(props: WaveGraphProp) {
         className={styles["progress-canvas"]}
         height={theme.graphHeight}
         ref={progressRef}
+        onClick={handleProgressClick}
       ></canvas>
     </div>
   );

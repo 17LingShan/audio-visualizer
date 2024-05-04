@@ -38,34 +38,38 @@ function App() {
       <div>
         <h2>something new</h2>
       </div>
-      <ControlGroup
-        audioContext={audioContext}
-        audioRef={SourceStateStore.audioRef}
-        isPlay={SourceStateStore.isPlaying}
-        onPlay={SourceStateStore.play}
-        onPause={SourceStateStore.pause}
-        handleUploadedFinished={SourceStateStore.decodeAudio}
-      />
-      <div className={styles["graph-group"]}>
-        <WaveGraph
-          audioRef={SourceStateStore.audioRef}
-          audioBuffer={SourceStateStore.audioBuffer}
-          audioContext={audioContext}
-          theme={GraphThemeStore.getTheme}
-        />
-        <FrequencyGraph
-          analyser={analyser}
-          dataArray={dataArray}
-          bufferLength={bufferLength}
-          theme={GraphThemeStore.getTheme}
-        />
-        <OscilloscopeGraph
-          analyser={analyser}
-          dataArray={dataArray}
-          bufferLength={bufferLength}
-          theme={GraphThemeStore.getTheme}
-        />
-      </div>
+      {SourceStateStore.audioRef ? (
+        <>
+          <ControlGroup
+            audioContext={audioContext}
+            audioRef={SourceStateStore.audioRef}
+            isPlay={SourceStateStore.isPlaying}
+            onPlay={SourceStateStore.play}
+            onPause={SourceStateStore.pause}
+            handleUploadedFinished={SourceStateStore.decodeAudio}
+          />
+          <div className={styles["graph-group"]}>
+            <WaveGraph
+              audioRef={SourceStateStore.audioRef}
+              audioBuffer={SourceStateStore.audioBuffer}
+              audioContext={audioContext}
+              theme={GraphThemeStore.getTheme}
+            />
+            <FrequencyGraph
+              analyser={analyser}
+              dataArray={dataArray}
+              bufferLength={bufferLength}
+              theme={GraphThemeStore.getTheme}
+            />
+            <OscilloscopeGraph
+              analyser={analyser}
+              dataArray={dataArray}
+              bufferLength={bufferLength}
+              theme={GraphThemeStore.getTheme}
+            />
+          </div>
+        </>
+      ) : null}
       <audio onEnded={handleAudioEnded} ref={audioRef}></audio>
     </div>
   );

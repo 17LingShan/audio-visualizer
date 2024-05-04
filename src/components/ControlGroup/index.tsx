@@ -1,12 +1,14 @@
 import styles from "./styles.module.scss";
 import commonStyles from "@/styles/common.module.scss";
 import { ChangeEventHandler } from "react";
+import useProgress from "@/hooks/useProgress";
 import { audioContext } from "@/audio/audioContext";
+import { formatSecondsAsMinutes } from "@/utils/common";
 
 interface ControlGroupProps {
   isPlay: boolean;
   audioContext: AudioContext;
-  audioRef: HTMLAudioElement | null;
+  audioRef: HTMLAudioElement;
   handleUploadedFinished?: (audioContext: AudioContext) => void;
   onPlay: (audioContext: AudioContext) => void;
   onPause: (audioContext: AudioContext) => void;
@@ -14,10 +16,9 @@ interface ControlGroupProps {
 
 function ControlGroup(props: ControlGroupProps) {
   const { isPlay, onPause, onPlay, audioRef, handleUploadedFinished } = props;
+  const { duration, currentTime } = useProgress(audioRef);
 
   const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (event) => {
-    if (!audioRef) return;
-
     const file = event.target.files!;
     audioRef.src = URL.createObjectURL(file[0]);
     audioRef.load();
@@ -25,10 +26,11 @@ function ControlGroup(props: ControlGroupProps) {
   };
 
   const handlePlayClick = () => {
-    if (!audioRef?.src) {
+    if (!audioRef.src) {
       console.log("no audio resource inside!");
       return;
     }
+
     isPlay ? onPause(audioContext) : onPlay(audioContext);
   };
 
@@ -37,20 +39,19 @@ function ControlGroup(props: ControlGroupProps) {
       <button className={commonStyles["old-button"]} onClick={handlePlayClick}>
         play/pause
       </button>
-      <label htmlFor="file" className={commonStyles["old-button"]}>
+      <label htmlFor="audio-file" className={commonStyles["old-button"]}>
         upload mp3 file
         <input
-          id="file"
+          id="audio-file"
           type="file"
-          style={{
-            display: "none",
-          }}
+          className={styles["file-button"]}
           onChange={handleFileUpload}
           accept=".mp3"
         />
       </label>
       <button className={commonStyles["old-button"]}>
-        {`${audioRef?.currentTime}/${audioRef?.duration}`}
+        {`${formatSecondsAsMinutes(currentTime)}/
+        ${formatSecondsAsMinutes(duration)}`}
       </button>
     </div>
   );
