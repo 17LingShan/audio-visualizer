@@ -4,7 +4,7 @@
  * @returns {string} 格式为00:00的字符串
  */
 export function formatSecondsAsMinutes(second: number): string {
-  const str = `${Math.round(second / 60)
+  const str = `${Math.floor(second / 60)
     .toString()
     .padStart(2, "0")}:${Math.floor(second % 60)
     .toString()

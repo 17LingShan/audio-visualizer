@@ -19,7 +19,9 @@ function App() {
   const track = useRef<MediaElementAudioSourceNode>();
 
   const handleAudioEnded = () => {
-    SourceStateStore.pause(audioContext);
+    SourceStateStore.isLoop
+      ? SourceStateStore.play(audioContext, 0)
+      : SourceStateStore.pause(audioContext);
   };
 
   useLayoutEffect(() => {
@@ -46,6 +48,7 @@ function App() {
             isPlay={SourceStateStore.isPlaying}
             onPlay={SourceStateStore.play}
             onPause={SourceStateStore.pause}
+            handleCheckLoop={SourceStateStore.setIsLoop}
             handleUploadedFinished={SourceStateStore.decodeAudio}
           />
           <div className={styles["graph-group"]}>

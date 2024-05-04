@@ -57,7 +57,7 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
     if (!canvasRef.current || !wrapRef.current) return;
     canvasContext.current = canvasRef.current.getContext("2d")!;
     canvasRef.current.width = wrapRef.current.clientWidth;
-    drawOscilloscope();
+    requestAnimationFrame(drawOscilloscope);
   }, []);
 
   return (

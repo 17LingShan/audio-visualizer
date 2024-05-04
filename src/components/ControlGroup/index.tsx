@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import styles from "./styles.module.scss";
 import commonStyles from "@/styles/common.module.scss";
 import { ChangeEventHandler } from "react";
@@ -9,13 +10,21 @@ interface ControlGroupProps {
   isPlay: boolean;
   audioContext: AudioContext;
   audioRef: HTMLAudioElement;
-  handleUploadedFinished?: (audioContext: AudioContext) => void;
   onPlay: (audioContext: AudioContext) => void;
   onPause: (audioContext: AudioContext) => void;
+  handleCheckLoop?: (loop: boolean) => void;
+  handleUploadedFinished?: (audioContext: AudioContext) => void;
 }
 
 function ControlGroup(props: ControlGroupProps) {
-  const { isPlay, onPause, onPlay, audioRef, handleUploadedFinished } = props;
+  const {
+    isPlay,
+    onPause,
+    onPlay,
+    audioRef,
+    handleCheckLoop,
+    handleUploadedFinished,
+  } = props;
   const { duration, currentTime } = useProgress(audioRef);
 
   const handleFileUpload: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -48,6 +57,20 @@ function ControlGroup(props: ControlGroupProps) {
           onChange={handleFileUpload}
           accept=".mp3"
         />
+      </label>
+      <label
+        htmlFor="check-loop"
+        className={classNames(
+          commonStyles["old-button"],
+          styles["checkbox-loop"]
+        )}
+      >
+        <input
+          id="check-loop"
+          type="checkbox"
+          onChange={(e) => handleCheckLoop?.(e.target.checked)}
+        />
+        loop play
       </label>
       <button className={commonStyles["old-button"]}>
         {`${formatSecondsAsMinutes(currentTime)}/

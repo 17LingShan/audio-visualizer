@@ -1,16 +1,13 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 export class SourceState {
+  isLoop: boolean = false;
   isPlaying: boolean = false;
   audioRef: HTMLAudioElement | null = null;
   audioBuffer: AudioBuffer | null = null;
 
   constructor() {
-    this.play = this.play.bind(this);
-    this.pause = this.pause.bind(this);
-    this.decodeAudio = this.decodeAudio.bind(this);
-
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   setRef(ref: HTMLAudioElement) {
@@ -21,8 +18,12 @@ export class SourceState {
     this.audioBuffer = buffer;
   }
 
-  setIsPlaying(play: boolean) {
-    this.isPlaying = play;
+  setIsPlaying(playing: boolean) {
+    this.isPlaying = playing;
+  }
+
+  setIsLoop(loop: boolean) {
+    this.isLoop = loop;
   }
 
   resume(audioContext: AudioContext) {
@@ -30,14 +31,19 @@ export class SourceState {
     audioContext.resume();
   }
 
-  play(audioContext: AudioContext) {
+  play(audioContext: AudioContext, time?: number) {
+    if (!this.audioRef) return;
+
     this.resume(audioContext);
+    if (time) this.audioRef.currentTime = time;
     this.audioRef?.play().then(() => this.setIsPlaying(true));
   }
 
   pause(audioContext: AudioContext) {
+    if (!this.audioRef) return;
+
     this.resume(audioContext);
-    this.audioRef?.pause();
+    this.audioRef.pause();
     this.setIsPlaying(false);
   }
 

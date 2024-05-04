@@ -66,7 +66,7 @@ function FrequencyGraph(props: FrequencyGraphProp) {
     if (!canvasRef.current || !wrapRef.current) return;
     canvasRef.current.width = wrapRef.current.clientWidth;
     canvasContext.current = canvasRef.current.getContext("2d")!;
-    drawFrequency();
+    requestAnimationFrame(drawFrequency);
   }, []);
 
   return (
