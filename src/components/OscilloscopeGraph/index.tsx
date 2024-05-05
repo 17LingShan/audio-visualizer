@@ -15,7 +15,6 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
   const canvasContext = useRef<CanvasRenderingContext2D>();
 
   function drawOscilloscope() {
-    requestAnimationFrame(drawOscilloscope);
     // 获取时域数据
     analyser.getByteTimeDomainData(dataArray);
 
@@ -51,6 +50,8 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
 
     canvasCtx.lineTo(wrap.clientWidth, wrap.clientHeight / 2);
     canvasCtx.stroke();
+
+    requestAnimationFrame(drawOscilloscope);
   }
 
   useEffect(() => {

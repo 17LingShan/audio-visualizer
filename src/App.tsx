@@ -11,6 +11,7 @@ import {
 import GraphThemeStore from "./store/graph";
 import SourceStateStore from "./store/audio";
 import WaveGraph from "./components/WaveGraph";
+import CircleGraph from "./components/CircleGraph";
 import ControlGroup from "./components/ControlGroup";
 import FrequencyGraph from "./components/FrequencyGraph";
 import OscilloscopeGraph from "./components/OscilloscopeGraph";
@@ -61,6 +62,12 @@ function App() {
               audioRef={SourceStateStore.audioRef}
               audioBuffer={SourceStateStore.audioBuffer}
               audioContext={audioContext}
+              theme={GraphThemeStore.getTheme}
+            />
+            <CircleGraph
+              analyser={analyser}
+              dataArray={dataArray}
+              bufferLength={bufferLength}
               theme={GraphThemeStore.getTheme}
             />
             <FrequencyGraph

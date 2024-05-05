@@ -15,7 +15,6 @@ function FrequencyGraph(props: FrequencyGraphProp) {
   const canvasContext = useRef<CanvasRenderingContext2D>();
 
   function drawFrequency() {
-    requestAnimationFrame(drawFrequency);
     // 获取频率数据
     analyser.getByteFrequencyData(dataArray);
 
@@ -60,10 +59,12 @@ function FrequencyGraph(props: FrequencyGraphProp) {
       // 向右平移一个可操作宽度
       x += barTotalWidth;
     }
+
+    requestAnimationFrame(drawFrequency);
   }
 
   useEffect(() => {
-    if (!canvasRef.current || !wrapRef.current) return;
+    if (!wrapRef.current || !canvasRef.current) return;
     canvasRef.current.width = wrapRef.current.clientWidth;
     canvasContext.current = canvasRef.current.getContext("2d")!;
     requestAnimationFrame(drawFrequency);
