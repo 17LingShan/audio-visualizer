@@ -10,6 +10,7 @@ interface ControlGroupProps {
   isPlay: boolean;
   audioContext: AudioContext;
   audioRef: HTMLAudioElement;
+  gainNode: GainNode;
   onPlay: (audioContext: AudioContext) => void;
   onPause: (audioContext: AudioContext) => void;
   handleCheckLoop?: (loop: boolean) => void;
@@ -19,9 +20,10 @@ interface ControlGroupProps {
 function ControlGroup(props: ControlGroupProps) {
   const {
     isPlay,
+    audioRef,
+    gainNode,
     onPause,
     onPlay,
-    audioRef,
     handleCheckLoop,
     handleUploadedFinished,
   } = props;
@@ -32,6 +34,13 @@ function ControlGroup(props: ControlGroupProps) {
     audioRef.src = URL.createObjectURL(file[0]);
     audioRef.load();
     handleUploadedFinished?.(audioContext);
+  };
+
+  const handleVolumeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    console.log(e.target.value);
+    if (!gainNode.gain) return;
+
+    gainNode.gain.value = +e.target.value;
   };
 
   const handlePlayClick = () => {
@@ -76,6 +85,13 @@ function ControlGroup(props: ControlGroupProps) {
         {`${formatSecondsAsMinutes(currentTime)}/
         ${formatSecondsAsMinutes(duration)}`}
       </button>
+      <input
+        type="range"
+        min={0}
+        max={1}
+        step={0.1}
+        onChange={handleVolumeChange}
+      />
     </div>
   );
 }

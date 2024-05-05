@@ -6,6 +6,7 @@ import {
   analyser,
   dataArray,
   bufferLength,
+  gain,
 } from "./audio/audioContext";
 import GraphThemeStore from "./store/graph";
 import SourceStateStore from "./store/audio";
@@ -28,7 +29,10 @@ function App() {
     if (track.current || !audioRef.current) return;
     SourceStateStore.setRef(audioRef.current);
     track.current = audioContext.createMediaElementSource(audioRef.current);
-    track.current.connect(analyser).connect(audioContext.destination);
+    track.current
+      .connect(analyser)
+      .connect(gain)
+      .connect(audioContext.destination);
 
     audioRef.current.addEventListener("canplay", () =>
       SourceStateStore.play(audioContext)
@@ -45,6 +49,7 @@ function App() {
           <ControlGroup
             audioContext={audioContext}
             audioRef={SourceStateStore.audioRef}
+            gainNode={gain}
             isPlay={SourceStateStore.isPlaying}
             onPlay={SourceStateStore.play}
             onPause={SourceStateStore.pause}
