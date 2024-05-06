@@ -34,8 +34,10 @@ export default function RayCircleGraph(props: CircleGraphProp) {
     const circleCtx = circleContextRef.current!;
     const x = circle.width >>> 1;
     const y = circle.height >>> 1;
+    circleCtx.fillStyle = "rgba(255,255,255,0)";
 
     circleCtx.beginPath();
+    circleCtx.strokeStyle = "red";
     circleCtx.arc(x, y, radius, 0, 2 * Math.PI);
     circleCtx.stroke();
   };
@@ -52,7 +54,7 @@ export default function RayCircleGraph(props: CircleGraphProp) {
     const raysCtx = raysContextRef.current!;
 
     raysCtx.fillStyle = theme.graphBackground as string;
-    raysCtx.fillRect(0, 0, rays.clientWidth, rays.clientHeight);
+    raysCtx.fillRect(0, 0, rays.width, rays.height);
 
     const initX = rays.width >>> 1;
     const initY = rays.height >>> 1;
@@ -82,6 +84,7 @@ export default function RayCircleGraph(props: CircleGraphProp) {
       gradient.addColorStop(1, "#ff0000");
       raysCtx.fillStyle = gradient;
       raysCtx.fillRect(0, 0, bufferLength / 360, barHeight);
+
       raysCtx.restore();
     }
 
@@ -90,11 +93,12 @@ export default function RayCircleGraph(props: CircleGraphProp) {
 
   const initScale = () => {
     if (!wrapRef.current || !raysRef.current || !circleRef.current) return;
-    console.log(123);
+
     raysRef.current.width = wrapRef.current.clientWidth;
     raysRef.current.height = wrapRef.current.clientHeight;
     circleRef.current.width = wrapRef.current.clientWidth;
     circleRef.current.height = wrapRef.current.clientHeight;
+    requestAnimationFrame(drawRays);
   };
 
   useEffect(() => {
@@ -108,8 +112,6 @@ export default function RayCircleGraph(props: CircleGraphProp) {
     initScale();
     raysContextRef.current = raysRef.current.getContext("2d")!;
     circleContextRef.current = circleRef.current.getContext("2d")!;
-    requestAnimationFrame(drawCircle);
-    requestAnimationFrame(drawRays);
   }, []);
 
   return (
