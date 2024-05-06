@@ -7,11 +7,11 @@ interface CircleGraphProp {
   dataArray: Uint8Array;
   bufferLength: number;
   theme: GraphThemeProps;
+  radius?: number;
 }
-const radius = 25; // 半径
 
 export default function CircleGraph(props: CircleGraphProp) {
-  const { analyser, dataArray, bufferLength, theme } = props;
+  const { analyser, dataArray, bufferLength, theme, radius = 50 } = props;
 
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +22,6 @@ export default function CircleGraph(props: CircleGraphProp) {
   const circleContextRef = useRef<CanvasRenderingContext2D>();
 
   const drawCircle = () => {
-    const wrap = wrapRef.current!;
     const circle = circleRef.current!;
     const circleCtx = circleContextRef.current!;
     const circleX = circle.width >>> 1;
