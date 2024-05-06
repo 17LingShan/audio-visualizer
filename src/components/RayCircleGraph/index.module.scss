@@ -2,7 +2,7 @@
   position: relative;
 
   .circle-canvas,
-  .bars-canvas {
+  .rays-canvas {
     position: absolute;
     top: 0;
     left: 0;
@@ -10,7 +10,7 @@
     height: 100%;
   }
 
-  .bars-canvas {
+  .rays-canvas {
     background-color: transparent;
   }
 }

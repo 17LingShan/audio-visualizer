@@ -1,5 +1,5 @@
 import styles from "./index.module.scss";
-import { MouseEventHandler, useEffect, useRef } from "react";
+import { CSSProperties, MouseEventHandler, useEffect, useRef } from "react";
 import useProgress from "@/hooks/useProgress";
 import { GraphThemeProps } from "@/store/type";
 import { getProgressXByDuration, getTimeByWidth } from "@/utils/common";
@@ -9,10 +9,11 @@ interface WaveGraphProp {
   audioRef: HTMLAudioElement;
   audioBuffer: AudioBuffer | null;
   theme: GraphThemeProps;
+  wrapStyle?: CSSProperties;
 }
 
 function WaveGraph(props: WaveGraphProp) {
-  const { audioBuffer, theme, audioRef } = props;
+  const { audioBuffer, theme, audioRef, wrapStyle } = props;
   const { duration, currentTime, handleChangeCurrentTime } =
     useProgress(audioRef);
 
@@ -96,6 +97,20 @@ function WaveGraph(props: WaveGraphProp) {
     handleChangeCurrentTime(time);
   };
 
+  const initScale = () => {
+    if (!wrapRef.current || !waveRef.current || !progressRef.current) return;
+
+    waveRef.current.width = wrapRef.current.clientWidth;
+    progressRef.current.width = wrapRef.current.clientWidth;
+    waveRef.current.height = wrapRef.current.clientHeight;
+    progressRef.current.height = wrapRef.current.clientHeight;
+  };
+
+  useEffect(() => {
+    initScale();
+    requestAnimationFrame(drawWave);
+  }, [wrapStyle]);
+
   useEffect(() => {
     requestAnimationFrame(drawWave);
   }, [audioBuffer]);
@@ -106,8 +121,7 @@ function WaveGraph(props: WaveGraphProp) {
 
   useEffect(() => {
     if (!wrapRef.current || !waveRef.current || !progressRef.current) return;
-    waveRef.current.width = wrapRef.current.clientWidth;
-    progressRef.current.width = wrapRef.current.clientWidth;
+    initScale();
     waveContext.current = waveRef.current.getContext("2d")!;
     progressContext.current = progressRef.current.getContext("2d")!;
   }, []);
@@ -116,16 +130,11 @@ function WaveGraph(props: WaveGraphProp) {
     <div
       className={styles["wave-wrap"]}
       ref={wrapRef}
-      style={{ height: theme.graphHeight }}
+      style={{ height: theme.graphHeight, ...wrapStyle }}
     >
-      <canvas
-        className={styles["wave-canvas"]}
-        height={theme.graphHeight}
-        ref={waveRef}
-      ></canvas>
+      <canvas className={styles["wave-canvas"]} ref={waveRef}></canvas>
       <canvas
         className={styles["progress-canvas"]}
-        height={theme.graphHeight}
         ref={progressRef}
         onClick={handleProgressClick}
       ></canvas>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 import type { GraphThemeProps } from "@/store/type";
 
 interface FrequencyGraphProp {
@@ -6,10 +6,11 @@ interface FrequencyGraphProp {
   dataArray: Uint8Array;
   bufferLength: number;
   theme: GraphThemeProps;
+  wrapStyle?: CSSProperties;
 }
 
 function FrequencyGraph(props: FrequencyGraphProp) {
-  const { analyser, dataArray, bufferLength, theme } = props;
+  const { analyser, dataArray, bufferLength, theme, wrapStyle } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContext = useRef<CanvasRenderingContext2D>();
@@ -63,15 +64,31 @@ function FrequencyGraph(props: FrequencyGraphProp) {
     requestAnimationFrame(drawFrequency);
   }
 
-  useEffect(() => {
+  const initScale = () => {
     if (!wrapRef.current || !canvasRef.current) return;
     canvasRef.current.width = wrapRef.current.clientWidth;
+    canvasRef.current.height = wrapRef.current.clientHeight;
+  };
+
+  useEffect(() => {
+    initScale();
+  }, [wrapStyle]);
+
+  useEffect(() => {
+    if (!wrapRef.current || !canvasRef.current) return;
+    initScale();
     canvasContext.current = canvasRef.current.getContext("2d")!;
     requestAnimationFrame(drawFrequency);
   }, []);
 
   return (
-    <div ref={wrapRef}>
+    <div
+      style={{
+        height: theme.graphHeight,
+        ...wrapStyle,
+      }}
+      ref={wrapRef}
+    >
       <canvas height={theme.graphHeight} ref={canvasRef}></canvas>
     </div>
   );

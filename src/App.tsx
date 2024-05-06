@@ -11,8 +11,8 @@ import {
 import GraphThemeStore from "./store/graph";
 import SourceStateStore from "./store/audio";
 import WaveGraph from "./components/WaveGraph";
-import CircleGraph from "./components/CircleGraph";
 import ControlGroup from "./components/ControlGroup";
+import RayCircleGraph from "./components/RayCircleGraph";
 import FrequencyGraph from "./components/FrequencyGraph";
 import OscilloscopeGraph from "./components/OscilloscopeGraph";
 
@@ -64,11 +64,12 @@ function App() {
               audioContext={audioContext}
               theme={GraphThemeStore.getTheme}
             />
-            <CircleGraph
+            <RayCircleGraph
               analyser={analyser}
               dataArray={dataArray}
               bufferLength={bufferLength}
               theme={GraphThemeStore.getTheme}
+              wrapStyle={{ width: "300px", height: "300px" }}
             />
             <FrequencyGraph
               analyser={analyser}

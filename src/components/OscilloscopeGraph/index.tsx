@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 import type { GraphThemeProps } from "@/store/type";
 
 interface OscilloscopeGraphProp {
@@ -6,10 +6,11 @@ interface OscilloscopeGraphProp {
   dataArray: Uint8Array;
   bufferLength: number;
   theme: GraphThemeProps;
+  wrapStyle?: CSSProperties;
 }
 
 function OscilloscopeGraph(props: OscilloscopeGraphProp) {
-  const { analyser, dataArray, bufferLength, theme } = props;
+  const { analyser, dataArray, bufferLength, theme, wrapStyle } = props;
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContext = useRef<CanvasRenderingContext2D>();
@@ -18,19 +19,19 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
     // 获取时域数据
     analyser.getByteTimeDomainData(dataArray);
 
-    const wrap = wrapRef.current!;
+    const canvas = canvasRef.current!;
     const canvasCtx = canvasContext.current!;
 
     // 每次绘制都会初始化画布
     canvasCtx.fillStyle = theme.graphBackground as string;
-    canvasCtx.fillRect(0, 0, wrap.clientWidth, wrap.clientHeight);
+    canvasCtx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     // 线宽px
     canvasCtx.lineWidth = 3;
 
     canvasCtx.beginPath();
 
-    const sliceWidth = (wrap.clientWidth * 1.0) / bufferLength;
+    const sliceWidth = (canvas.clientWidth * 1.0) / bufferLength;
     let x = 0;
 
     canvasCtx.strokeStyle = `rgb(66,196,48)`;
@@ -42,27 +43,45 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
        */
       // 将 vertical 归一化到[0, 1]
       const vertical = dataArray[i] / 256;
-      const y = vertical * wrap.clientHeight;
+      const y = vertical * canvas.clientHeight;
 
       i === 0 ? canvasCtx.moveTo(x, y) : canvasCtx.lineTo(x, y);
       x += sliceWidth;
     }
 
-    canvasCtx.lineTo(wrap.clientWidth, wrap.clientHeight / 2);
+    canvasCtx.lineTo(canvas.clientWidth, canvas.clientHeight / 2);
     canvasCtx.stroke();
 
     requestAnimationFrame(drawOscilloscope);
   }
 
+  const initScale = () => {
+    if (!wrapRef.current || !canvasRef.current) return;
+
+    canvasRef.current.width = wrapRef.current.clientWidth;
+    canvasRef.current.height = wrapRef.current.clientHeight;
+  };
+
+  useEffect(() => {
+    initScale();
+  }, [wrapStyle]);
+
   useEffect(() => {
     if (!canvasRef.current || !wrapRef.current) return;
+
+    initScale();
     canvasContext.current = canvasRef.current.getContext("2d")!;
-    canvasRef.current.width = wrapRef.current.clientWidth;
     requestAnimationFrame(drawOscilloscope);
   }, []);
 
   return (
-    <div ref={wrapRef}>
+    <div
+      ref={wrapRef}
+      style={{
+        height: theme.graphHeight,
+        ...wrapStyle,
+      }}
+    >
       <canvas height={theme.graphHeight} ref={canvasRef}></canvas>
     </div>
   );
