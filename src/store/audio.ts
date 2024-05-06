@@ -1,6 +1,7 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 export class SourceState {
+  fileName: string = "";
   isLoop: boolean = false;
   isPlaying: boolean = false;
   audioRef: HTMLAudioElement | null = null;
@@ -12,6 +13,10 @@ export class SourceState {
 
   setRef(ref: HTMLAudioElement) {
     this.audioRef = ref;
+  }
+
+  setFileName(name: string) {
+    this.fileName = name;
   }
 
   setAudioBuffer(buffer: AudioBuffer) {
@@ -47,7 +52,7 @@ export class SourceState {
     this.setIsPlaying(false);
   }
 
-  decodeAudio(audioContext: AudioContext) {
+  decodeAudio(audioContext: AudioContext, files?: FileList) {
     if (!this.audioRef) return;
 
     const xhr = new XMLHttpRequest();
@@ -61,6 +66,9 @@ export class SourceState {
       );
     };
     xhr.send();
+
+    if (!files) return;
+    this.setFileName(files[0].name);
   }
 }
 

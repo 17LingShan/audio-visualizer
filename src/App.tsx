@@ -1,5 +1,6 @@
 import styles from "./App.module.scss";
 import { useLayoutEffect, useRef } from "react";
+import { toJS } from "mobx";
 import { observer } from "mobx-react";
 import {
   audioContext,
@@ -42,8 +43,8 @@ function App() {
 
   return (
     <div>
-      <div>
-        <h2>something new</h2>
+      <div className={styles["file-name-wrap"]}>
+        <h2>{toJS(SourceStateStore.fileName) || `something new`}</h2>
       </div>
       {SourceStateStore.audioRef ? (
         <>

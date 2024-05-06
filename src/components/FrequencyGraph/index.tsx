@@ -1,4 +1,5 @@
 import { CSSProperties, useEffect, useRef } from "react";
+import useReSize from "@/hooks/useResize";
 import type { GraphThemeProps } from "@/store/type";
 
 interface FrequencyGraphProp {
@@ -66,19 +67,24 @@ function FrequencyGraph(props: FrequencyGraphProp) {
 
   const initScale = () => {
     if (!wrapRef.current || !canvasRef.current) return;
+
     canvasRef.current.width = wrapRef.current.clientWidth;
     canvasRef.current.height = wrapRef.current.clientHeight;
+    requestAnimationFrame(drawFrequency);
   };
+
+  useReSize(() => initScale(), [], { debounce: 300 });
 
   useEffect(() => {
     initScale();
+    requestAnimationFrame(drawFrequency);
   }, [wrapStyle]);
 
   useEffect(() => {
     if (!wrapRef.current || !canvasRef.current) return;
+
     initScale();
     canvasContext.current = canvasRef.current.getContext("2d")!;
-    requestAnimationFrame(drawFrequency);
   }, []);
 
   return (

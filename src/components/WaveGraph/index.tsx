@@ -1,7 +1,8 @@
 import styles from "./index.module.scss";
 import { CSSProperties, MouseEventHandler, useEffect, useRef } from "react";
+import useReSize from "@/hooks/useResize";
 import useProgress from "@/hooks/useProgress";
-import { GraphThemeProps } from "@/store/type";
+import type { GraphThemeProps } from "@/store/type";
 import { getProgressXByDuration, getTimeByWidth } from "@/utils/common";
 
 interface WaveGraphProp {
@@ -104,11 +105,13 @@ function WaveGraph(props: WaveGraphProp) {
     progressRef.current.width = wrapRef.current.clientWidth;
     waveRef.current.height = wrapRef.current.clientHeight;
     progressRef.current.height = wrapRef.current.clientHeight;
+    requestAnimationFrame(drawWave);
   };
+
+  useReSize(() => initScale(), [audioBuffer], { debounce: 300 });
 
   useEffect(() => {
     initScale();
-    requestAnimationFrame(drawWave);
   }, [wrapStyle]);
 
   useEffect(() => {

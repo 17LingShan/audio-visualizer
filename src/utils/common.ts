@@ -41,3 +41,19 @@ export function getProgressXByDuration(
 ): number {
   return time * (wrapWidth / duration);
 }
+
+/**
+ * @description 节流函数, 一段操作后只执行一次
+ * @param callback
+ * @param delay
+ * @returns
+ */
+export function debounce<T extends Function>(callback: T, delay: number = 300) {
+  let time: number | null = null;
+  return (...args: any) => {
+    if (time !== null) clearTimeout(time);
+    time = setTimeout(() => {
+      callback.apply(null, args);
+    }, delay);
+  };
+}

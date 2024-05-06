@@ -14,7 +14,10 @@ interface ControlGroupProps {
   onPlay: (audioContext: AudioContext) => void;
   onPause: (audioContext: AudioContext) => void;
   handleCheckLoop?: (loop: boolean) => void;
-  handleUploadedFinished?: (audioContext: AudioContext) => void;
+  handleUploadedFinished?: (
+    audioContext: AudioContext,
+    files?: FileList
+  ) => void;
 }
 
 function ControlGroup(props: ControlGroupProps) {
@@ -33,7 +36,7 @@ function ControlGroup(props: ControlGroupProps) {
     const file = event.target.files!;
     audioRef.src = URL.createObjectURL(file[0]);
     audioRef.load();
-    handleUploadedFinished?.(audioContext);
+    handleUploadedFinished?.(audioContext, file);
   };
 
   const handleVolumeChange: ChangeEventHandler<HTMLInputElement> = (e) => {

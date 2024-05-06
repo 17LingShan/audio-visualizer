@@ -1,4 +1,5 @@
 import { CSSProperties, useEffect, useRef } from "react";
+import useReSize from "@/hooks/useResize";
 import type { GraphThemeProps } from "@/store/type";
 
 interface OscilloscopeGraphProp {
@@ -60,7 +61,10 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
 
     canvasRef.current.width = wrapRef.current.clientWidth;
     canvasRef.current.height = wrapRef.current.clientHeight;
+    requestAnimationFrame(drawOscilloscope);
   };
+
+  useReSize(() => initScale(), [], { debounce: 300 });
 
   useEffect(() => {
     initScale();
@@ -71,7 +75,6 @@ function OscilloscopeGraph(props: OscilloscopeGraphProp) {
 
     initScale();
     canvasContext.current = canvasRef.current.getContext("2d")!;
-    requestAnimationFrame(drawOscilloscope);
   }, []);
 
   return (
