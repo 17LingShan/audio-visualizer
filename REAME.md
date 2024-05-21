@@ -7,6 +7,9 @@ The project is a visualizer of audio using the `Web Audio API`.
 - [x] Oscilloscope graph.
 - [x] Circle graph with dancing rays.
 
+![](./src/assets/snipaste-1.png)
+![](./src/assets/snipaste-2.png)
+
 # Run
 
 ```
